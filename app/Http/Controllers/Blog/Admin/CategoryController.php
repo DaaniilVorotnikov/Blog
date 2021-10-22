@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Blog\Admin;
 
+use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Blog\Admin\BaseController;
 use App\Models\BlogCategory;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ class CategoryController extends BaseController
 
        //dd($dsd, $paginator);
 
-       return view('blog.admin.category.index', compact('paginator'));
+       return view('blog.admin.categories.index', compact('paginator'));
     }
 
     /**
@@ -67,7 +68,7 @@ class CategoryController extends BaseController
        // dd($item);
        $categoryList = BlogCategory::all();
 
-       return view('blog.admin.category.edit', 
+       return view('blog.admin.categories.edit', 
        compact('item', 'categoryList'));
     }
 
@@ -79,8 +80,49 @@ class CategoryController extends BaseController
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
-        dd(__METHOD__);
+    {      
+        $rules = [
+            'title' => 'required|min:5|max:200',
+            'slug' => 'max:200',
+            'description' => 'string|max:500|min:3',
+            'parent_id' => 'required|integer|exists:blog_categories',
+        ];
+
+      //  $validatedData = $this->validate($request, $rules);
+
+        //$validatedData = $request->validate($rules);
+
+        // $validator = Validator::make($request->all(), $rules);
+        // $validatedData[] = $validator->validate();
+        // $validatedData[] = $validator->validated(); 
+        // $validatedData[] = $validator->failed();
+        // $validatedData[] = $validator->errors();
+        // $validatedData[] = $validator->fails();
+
+    //    dd($validatedData);
+
+       $item = BlogCategory::find($id);
+      // dd($item);
+       if (empty($item)){
+           return back()
+                ->withErrors(['msg' => "Запись id=[{$id}] не найдена"])
+                ->withInput();
+       }
+
+       $data = $request->all();
+       $result = $item
+            ->fill($data)
+            ->save();
+
+       if($result){
+           return redirect()
+                ->route('blog.admin.categories.edit', $item->id)
+                ->with(['success' => 'Успешно сохранено']);
+       } else{
+           return back()
+                ->withErrors(['msg' => 'Ошибка сохранения'])
+                ->withInput();
+       }
     }
 
     /**
