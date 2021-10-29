@@ -18,10 +18,20 @@ class CategoryController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
+
+     private $blogCategoryRepository;
+
+     public function __construct()
+     {
+         parent:: __construct();
+         $this->blogCategoryRepository = app(BlogCategoryRepository::class);
+     }
+
+
     public function index()
     {
        $dsd = BlogCategory::all();
-       $paginator = BlogCategory::paginate(15);
+       $paginator =  $this->blogCategoryRepository->getAllWithPaginate(15);
 
        //dd($dsd, $paginator);
 
@@ -92,6 +102,11 @@ class CategoryController extends BaseController
        // dd($item);
 
        $item = $categoryRepository->getEdit($id);
+
+       if(empty($item)){
+           abort(404);
+       }
+
        $categoryList = $categoryRepository->getForComboBox();
 
        return view('blog.admin.categories.edit', 
