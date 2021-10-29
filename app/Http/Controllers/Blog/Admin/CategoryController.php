@@ -4,8 +4,12 @@ namespace App\Http\Controllers\Blog\Admin;
 
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Blog\Admin\BaseController;
+use App\Http\Requests\BlogCategoryUpdateRequest;
 use App\Models\BlogCategory;
+use App\Repositories\BlogCategoryRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+
 
 class CategoryController extends BaseController
 {
@@ -14,10 +18,20 @@ class CategoryController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
+
+     private $blogCategoryRepository;
+
+     public function __construct()
+     {
+         parent:: __construct();
+         $this->blogCategoryRepository = app(BlogCategoryRepository::class);
+     }
+
+
     public function index()
     {
        $dsd = BlogCategory::all();
-       $paginator = BlogCategory::paginate(15);
+       $paginator =  $this->blogCategoryRepository->getAllWithPaginate(15);
 
        //dd($dsd, $paginator);
 
@@ -31,13 +45,12 @@ class CategoryController extends BaseController
      */
     public function create()
     {
-       // dd(__METHOD__);
-       $item = new BlogCategory();
-       $categoryList
-            = $this->blogCategoryRepository->getForComboBox();
 
-        return view('blog.admin.categories.edit', 
-        compact('item', 'categoryList'));
+        $item = new BlogCategory();
+      
+        $categoryList = BlogCategory::all();
+
+        return view('blog.admin.categories.edit', compact('item', 'categoryList'));
     }
 
     /**
@@ -46,9 +59,25 @@ class CategoryController extends BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(BlogCategoryUpdateRequest $request)
     {
-        dd(__METHOD__);
+        $data = $request->input();
+        if(empty($data['slug'])){
+            $data['slug'] = Str::slug($data['title']);
+        }
+
+        //Создаст объект но добавит в БД
+
+        $item = (new BlogCategory())->create($data);
+
+
+        if($item){
+            return redirect()->route('blog.admin.category.edit', [$item->id])
+                ->with(['success' => 'Успешно сохранено']);
+        } else{
+            return back()->withErrors(['msg' => 'Ошибка сохранения'])
+            ->withInput();
+        }
     }
 
     /**
@@ -68,11 +97,18 @@ class CategoryController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($id, BlogCategoryRepository $categoryRepository)
     {
-       $item = BlogCategory::findOrFail($id);
+      // $item = BlogCategory::findOrFail($id);
        // dd($item);
-       $categoryList = BlogCategory::all();
+
+       $item = $categoryRepository->getEdit($id);
+
+       if(empty($item)){
+           abort(404);
+       }
+
+       $categoryList = $categoryRepository->getForComboBox();
 
        return view('blog.admin.categories.edit', 
        compact('item', 'categoryList'));
@@ -85,14 +121,14 @@ class CategoryController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(BlogCategoryUpdateRequest $request, $id)
     {      
-        $rules = [
-            'title' => 'required|min:5|max:200',
-            'slug' => 'max:200',
-            'description' => 'string|max:500|min:3',
-            'parent_id' => 'required|integer|exists:blog_categories',
-        ];
+        // $rules = [
+        //     'title' => 'required|min:5|max:200',
+        //     'slug' => 'max:200',
+        //     'description' => 'string|max:500|min:3',
+        //     'parent_id' => 'required|integer|exists:blog_categories',
+        // ];
 
       //  $validatedData = $this->validate($request, $rules);
 
@@ -116,9 +152,11 @@ class CategoryController extends BaseController
        }
 
        $data = $request->all();
-       $result = $item
-            ->fill($data)
-            ->save();
+       if (empty($data['slug'])){
+           $data['slug'] =Str::slug($data['title']);
+       }
+     
+       $result = $item->update($data);
 
        if($result){
            return redirect()
