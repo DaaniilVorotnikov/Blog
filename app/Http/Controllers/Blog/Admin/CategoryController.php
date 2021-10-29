@@ -31,7 +31,13 @@ class CategoryController extends BaseController
      */
     public function create()
     {
-        dd(__METHOD__);
+       // dd(__METHOD__);
+       $item = new BlogCategory();
+       $categoryList
+            = $this->blogCategoryRepository->getForComboBox();
+
+        return view('blog.admin.categories.edit', 
+        compact('item', 'categoryList'));
     }
 
     /**
