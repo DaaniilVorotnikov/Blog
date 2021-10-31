@@ -21,7 +21,6 @@
                             </thead>
                             <tbody>
                             @foreach($paginator as $item)
-                                @php/** @var \App\Models\BlogCategory $item */ @endphp
                                 <tr>
                                     <td>{{ $item->id }}</td>
                                     <td>
