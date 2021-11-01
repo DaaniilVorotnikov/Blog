@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers\Blog\Admin;
 
-use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Blog\Admin\BaseController;
 use App\Http\Requests\BlogCategoryUpdateRequest;
 use App\Models\BlogCategory;
 use App\Repositories\BlogCategoryRepository;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 
@@ -45,11 +43,14 @@ class CategoryController extends BaseController
      */
     public function create()
     {
+
         $item = new BlogCategory();
       
-        $categoryList = BlogCategory::all();
+        $categoryList = 
+            $this->blogCategoryRepository->getForComboBox();
 
-        return view('blog.admin.categories.edit', compact('item', 'categoryList'));
+        return view('blog.admin.categories.edit', 
+            compact('item', 'categoryList'));
     }
 
     /**
@@ -107,7 +108,8 @@ class CategoryController extends BaseController
            abort(404);
        }
 
-       $categoryList = $categoryRepository->getForComboBox();
+       $categoryList 
+        = $this->blogCategoryRepository->getForComboBox();
 
        return view('blog.admin.categories.edit', 
        compact('item', 'categoryList'));
@@ -142,7 +144,7 @@ class CategoryController extends BaseController
 
     //    dd($validatedData);
 
-       $item = BlogCategory::find($id);
+       $item = $this->blogCategoryRepository->getEdit($id);
       // dd($item);
        if (empty($item)){
            return back()

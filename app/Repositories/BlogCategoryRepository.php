@@ -3,8 +3,7 @@
 namespace App\Repositories; 
 
 use App\Models\BlogCategory as Model;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\DB;
+
 
 class BlogCategoryRepository extends CoreRepository
 {
@@ -22,24 +21,20 @@ class BlogCategoryRepository extends CoreRepository
     {
        // return $this->startConditions()->all();
 
-       $fields = implode(', ', [
+       $columns = implode(', ', [
            'id',
-           'CONCAT (id ". " title) AS id_title',
+           'CONCAT (id, title) AS id_title',
        ]);
 
-       $result[] = $this->startConditions()->all();
-       $result[] = $this
-        ->startConditions()
-        ->select('blog_categories.*',
-            DB::raw('CONCAT (id,".", title) AS id_title'))
-        ->toBase()
-        ->get();
-
-        $result[] = $this
+        $result = $this
             ->startConditions()
-            ->selectRaw($fields)
+            ->selectRaw($columns)
             ->toBase()
             ->get();
+
+            //dd($result->first());
+
+        return $result;    
     }
 
     public function getAllWithPaginate($perPage = null)
@@ -49,7 +44,7 @@ class BlogCategoryRepository extends CoreRepository
         $result = $this
             ->startConditions()
             ->select($columns)
-            
+            ->toBase()
             ->paginate($perPage);
 
         return $result;

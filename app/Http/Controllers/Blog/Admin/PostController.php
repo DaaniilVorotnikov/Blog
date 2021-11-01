@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Blog;
+namespace App\Http\Controllers\Blog\Admin;
 
 use App\Http\Controllers\Blog\BaseController;
 use App\Models\BlogPost;
+use App\Repositories\BlogPostRepository;
 use Illuminate\Http\Request;
 
 class PostController extends BaseController
@@ -13,13 +14,21 @@ class PostController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
+
+    private $blogPostRepository; 
+
+    public function __construct()
+    {
+        //parent:: __construct();
+        $this->blogPostRepository = app(BlogPostRepository::class);
+    }
+
+
     public function index()
     {
-        $items = BlogPost::all();
 
-       dd($items->first());
-
-        return view('blog.posts.index', compact('items'));
+        $paginator = $this->blogPostRepository->getAllWithPaginate();
+        return view('blog.admin.posts.index', compact('paginator'));
     }
 
     /**
@@ -29,7 +38,7 @@ class PostController extends BaseController
      */
     public function create()
     {
-        //
+        dd(__METHOD__);
     }
 
     /**
@@ -62,7 +71,7 @@ class PostController extends BaseController
      */
     public function edit($id)
     {
-        //
+        dd(__METHOD__, $id);
     }
 
     /**
@@ -74,7 +83,7 @@ class PostController extends BaseController
      */
     public function update(Request $request, $id)
     {
-        //
+        dd(__METHOD__, $request->all(), $id);
     }
 
     /**
@@ -85,6 +94,6 @@ class PostController extends BaseController
      */
     public function destroy($id)
     {
-        //
+        dd(__METHOD__, $id);
     }
 }

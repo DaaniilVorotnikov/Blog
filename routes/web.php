@@ -3,7 +3,7 @@
 use App\Http\Controllers\Blog\Admin\CategoryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RestTestController;
-use App\Http\Controllers\Blog\PostController;
+use App\Http\Controllers\Blog\Admin\PostController;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -36,6 +36,11 @@ Route::prefix('admin/blog')->group(function(){
     //BlogCategory
     $mehods = ['index', 'edit', 'store', 'update', 'create',];
     Route::resource('categories', CategoryController::class)
-    ->only($mehods)
-    ->names('blog.admin.categories');
+        ->only($mehods)
+        ->names('blog.admin.categories');
+
+    //BlogPost
+    Route::resource('posts', PostController::class)
+        ->except(['show'])
+        ->names('blog.admin.posts');
 });
