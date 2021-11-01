@@ -65,7 +65,7 @@ class CategoryController extends BaseController
             $data['slug'] = Str::slug($data['title']);
         }
 
-        //Создаст объект но добавит в БД
+        //Создаст объект и добавит в БД
 
         $item = (new BlogCategory())->create($data);
 

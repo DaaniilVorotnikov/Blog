@@ -24,14 +24,14 @@ class BlogCategoryRepository extends CoreRepository
 
        $fields = implode(', ', [
            'id',
-           'CONCAT (id, ". ", title) AS id_title',
+           'CONCAT (id ". " title) AS id_title',
        ]);
 
        $result[] = $this->startConditions()->all();
        $result[] = $this
         ->startConditions()
         ->select('blog_categories.*',
-            DB::raw('CONCAT (id, ". ", title) AS id_title'))
+            DB::raw('CONCAT (id,".", title) AS id_title'))
         ->toBase()
         ->get();
 
