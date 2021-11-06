@@ -13,7 +13,7 @@ class BlogPostRepository extends CoreRepository
 
     public function getAllWithPaginate()
     {
-        $fields = [
+        $columns = [
             'id',
             'title',
             'slug',
@@ -24,7 +24,7 @@ class BlogPostRepository extends CoreRepository
         ];
 
         $result = $this->startConditions()
-                        ->select($fields)
+                        ->select($columns)
                         ->orderBy('id', 'DESC')
                         ->paginate(25);
     
