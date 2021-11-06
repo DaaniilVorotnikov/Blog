@@ -23,7 +23,7 @@ class BlogCategoryRepository extends CoreRepository
 
        $columns = implode(', ', [
            'id',
-           'CONCAT (id, ". ", title) AS id_title',
+           'CONCAT (id, title) AS id_title',
        ]);
 
         $result = $this
