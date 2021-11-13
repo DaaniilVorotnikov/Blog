@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Blog;
 
 use App\Http\Controllers\Blog\BaseController;
 use App\Models\BlogPost;
+use App\Repositories\BlogCategoryRepository;
+use App\Repositories\BlogPostRepository;
 use Illuminate\Http\Request;
 
 class PostController extends BaseController
@@ -13,6 +15,7 @@ class PostController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
+
     public function index()
     {
         $items = BlogPost::all();
